@@ -1,0 +1,17 @@
+==============================
+  V.E.D.A.
+  Vedic Education & Data Archive
+==============================
+
+  --- RUN FROM USB ---
+
+  Mac:     Double-click "OPEN ON MAC.command"
+  Windows: Double-click "OPEN ON WINDOWS.exe"
+  Linux:   Open terminal, run: bash "OPEN ON LINUX.sh"
+
+  --- INSTALL ON YOUR COMPUTER ---
+
+  Mac/Linux: Open terminal, run: python3 install.py
+  Windows:   Double-click "INSTALL ON WINDOWS.bat"
+
+==============================
