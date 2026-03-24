@@ -4,3 +4,4 @@ data/*.zim
 web/public/vedabase-index.json
 .DS_Store
 *.log
+.wrangler/

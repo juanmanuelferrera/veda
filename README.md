@@ -2,17 +2,27 @@
 
 **Vedic Education & Data Archive**
 
-Offline search over Srila Prabhupada's complete works. Plug a USB into any computer, run, and search — no internet needed for search. Optional AI answers with your own API key (needs internet).
+Offline search over Srila Prabhupada's complete works + Bhakti Yoga course. Runs on Mac, Windows, and Linux. No internet needed for search.
 
-## What's inside
+## Features
 
-- **58,437 passages** from Prabhupada's complete Vedabase (29 books + conversations + lectures + letters)
-- **Fuse.js** instant fuzzy search in the browser
+- **Vedabase Search** — 58,437 passages from 29 books, conversations, lectures, and letters
+- **Bhakta Course** — 10 units with lessons and 183 quiz questions, progress tracking
 - **Book filter** — search within a specific book
 - **AI answers** (optional) — connect your own Gemini, OpenAI, or Claude API key
-- **Cross-platform** — runs on Mac, Windows, and Linux from the same USB
+- **Cross-platform** — Mac, Windows, Linux from the same USB or download
 
-## How to use from USB
+## Install from anywhere (one command)
+
+### Mac / Linux
+```bash
+curl -sL https://raw.githubusercontent.com/juanmanuelferrera/veda/main/install-remote.sh | bash
+```
+
+### Windows
+Download [VEDA.zip](https://github.com/juanmanuelferrera/veda/releases/latest) and run `OPEN ON WINDOWS.exe`
+
+## Use from USB
 
 ### Mac
 Double-click **`OPEN ON MAC.command`**
@@ -25,59 +35,61 @@ Open a terminal in the USB folder and run:
 ```bash
 bash "OPEN ON LINUX.sh"
 ```
-> Note: Linux mounts FAT32 USB drives with `noexec`, so you cannot double-click to run. This is a one-time terminal command.
 
-## Install on your computer
+## Install from USB
 
-Copies V.E.D.A. to your local disk so you can run it without the USB.
+Copies V.E.D.A. to your local disk. After install, remove the USB.
 
-### Mac
-Double-click **`INSTALL ON MAC.command`**
+| Platform | Action |
+|----------|--------|
+| Mac | Double-click `INSTALL ON MAC.command` |
+| Windows | Double-click `INSTALL ON WINDOWS.bat` |
+| Linux | Run `python3 install.py` in terminal |
 
-### Windows
-Double-click **`INSTALL ON WINDOWS.bat`**
+After install: desktop shortcut, app menu entry, auto-starts on boot.
 
-### Linux
-Open a terminal in the USB folder and run:
-```bash
-python3 install.py
-```
-After install:
-- Desktop shortcut created
-- Added to app menu (Super key → search "VEDA")
-- Auto-starts on boot
-- USB can be removed
+## Bhakta Course
+
+10 units covering the foundations of Bhakti Yoga:
+
+1. El Maestro Espiritual y el Discípulo
+2. Sadhana Bhakti, la Práctica
+3. Conocimiento Védico
+4. Predicación
+5. Filosofía Védica
+6. Devotos del Señor
+7. Grandes Maestros Espirituales
+8. Servicio Devocional
+9. Las Creaciones Materiales y Espirituales
+10. Cultura Védica
+
+Each unit includes reading material and a multiple-choice quiz. Progress is saved locally.
 
 ## AI Answers (optional)
 
-V.E.D.A. can generate AI answers based on search results. Click **Settings** in the app to configure:
+Click **Settings** in the app to configure:
 
-1. Choose a provider: **Gemini**, **OpenAI**, or **Claude**
+1. Choose provider: **Gemini**, **OpenAI**, or **Claude**
 2. Enter your API key
 3. Click **AI Answer** after searching
 
-Keys are stored locally in your browser only. Internet is required for AI answers.
+Keys stored locally in your browser only. Internet required for AI answers only.
 
 ## Specs
 
-- **USB size**: ~150 MB (any USB drive works)
-- **No installation required** to run from USB
-- **No internet required** for search
-- **Internet required** only for AI answers
+- **Download**: ~45 MB compressed
+- **Installed**: ~150 MB
+- **USB**: any drive 256 MB or larger
+- **Internet**: not needed for search or course, only for AI answers
 
 ## Data source
 
 Vedabase Original Edition (with diacritics) from https://vedabase.vedicvault.org/
 
-## Build the index
-
-If you want to rebuild the search index from source:
+## Build the index from source
 
 ```bash
-# Download Vedabase
 curl -L -o data/vedabase.md "https://pub-9ebe02965a9f4aeb9c5d3d9741790d2d.r2.dev/original_vedabase_2026.md"
-
-# Build index
 node scripts/build-index.js
 ```
 
