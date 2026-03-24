@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: veda-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: veda-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  kiwix:
+    image: ghcr.io/kiwix/kiwix-serve:latest
+    container_name: veda-kiwix
+    ports:
+      - "8888:8080"
+    volumes:
+      - ../data/zim:/data
+    command: /data/*.zim
+    restart: unless-stopped
+
+  kolibri:
+    image: learningequality/kolibri:latest
+    container_name: veda-kolibri
+    ports:
+      - "8889:8080"
+    volumes:
+      - kolibri_data:/root/.kolibri
+    environment:
+      - KOLIBRI_LISTEN_PORT=8080
+    restart: unless-stopped
+
+  web:
+    build: ../web
+    container_name: veda-web
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - QDRANT_URL=http://qdrant:6333
+      - KIWIX_URL=http://kiwix:8080
+      - KOLIBRI_URL=http://kolibri:8080
+      - COLLECTION_NAME=vedabase
+    depends_on:
+      - ollama
+      - qdrant
+      - kiwix
+      - kolibri
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+  qdrant_data:
+  kolibri_data:
