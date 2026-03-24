@@ -48,17 +48,28 @@ func main() {
 	fmt.Printf("  http://localhost:%s\n", port)
 	fmt.Println()
 
-	// Open browser after 1 second
+	// Open browser in app mode after 1 second
 	go func() {
 		time.Sleep(1 * time.Second)
 		url := fmt.Sprintf("http://localhost:%s", port)
+		appURL := fmt.Sprintf("--app=%s", url)
 		switch runtime.GOOS {
 		case "linux":
-			exec.Command("xdg-open", url).Start()
+			if err := exec.Command("google-chrome", appURL).Start(); err != nil {
+				if err := exec.Command("chromium-browser", appURL).Start(); err != nil {
+					exec.Command("xdg-open", url).Start()
+				}
+			}
 		case "darwin":
-			exec.Command("open", url).Start()
+			if err := exec.Command("open", "-na", "Google Chrome", "--args", appURL).Start(); err != nil {
+				exec.Command("open", url).Start()
+			}
 		case "windows":
-			exec.Command("cmd", "/c", "start", url).Start()
+			if err := exec.Command("cmd", "/c", "start", "chrome", appURL).Start(); err != nil {
+				if err := exec.Command("cmd", "/c", "start", "msedge", appURL).Start(); err != nil {
+					exec.Command("cmd", "/c", "start", url).Start()
+				}
+			}
 		}
 	}()
 
