@@ -1,0 +1,5 @@
+node_modules/
+data/vedabase.md
+data/*.zim
+.DS_Store
+*.log

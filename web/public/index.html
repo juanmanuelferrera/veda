@@ -314,6 +314,43 @@
                 <div class="service-name">Courses</div>
                 <div class="service-desc">Bhakti education</div>
             </a>
+            <div class="service-card" onclick="toggleModels()">
+                <div class="service-icon">&#129302;</div>
+                <div class="service-name">AI Models</div>
+                <div class="service-desc" id="currentModelLabel">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Model Manager -->
+        <div class="answer-box" id="modelManager" style="display:none; margin-top: 1.5rem;">
+            <div class="answer-label">AI Model Manager</div>
+            <div id="modelList"></div>
+            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem;">Download new model</div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <select id="modelSelect" style="flex:1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.85rem;">
+                        <option value="llama3.2:1b">Llama 3.2 1B (1.3 GB) — Fast, basic</option>
+                        <option value="llama3.2:3b">Llama 3.2 3B (2 GB) — Good balance</option>
+                        <option value="llama3.1:8b">Llama 3.1 8B (4.7 GB) — Best for 16GB RAM</option>
+                        <option value="qwen2.5:7b">Qwen 2.5 7B (4.7 GB) — Strong multilingual</option>
+                        <option value="mistral:7b">Mistral 7B (4.1 GB) — Fast and capable</option>
+                        <option value="gemma2:9b">Gemma 2 9B (5.4 GB) — Google's model</option>
+                        <option value="llama3.1:70b-q4_0">Llama 3.1 70B Q4 (40 GB) — Best quality, needs 32GB+ RAM</option>
+                    </select>
+                    <button class="btn btn-primary" style="flex:none;" onclick="pullModel()" id="pullBtn">Download</button>
+                </div>
+                <div id="pullStatus" style="font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem;"></div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">Or enter any Ollama model name:</div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="customModel" placeholder="e.g. phi3:mini" style="flex:1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.85rem;">
+                    <button class="btn btn-secondary" onclick="pullCustomModel()">Download</button>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                <div style="font-size: 0.8rem; color: var(--muted);" id="collectionInfo">Loading collection info...</div>
+            </div>
         </div>
 
         <footer>
@@ -410,8 +447,105 @@
             document.getElementById('loading').classList.remove('visible');
         }
 
+        // Model management
+        function toggleModels() {
+            var m = document.getElementById('modelManager');
+            m.style.display = m.style.display === 'none' ? 'block' : 'none';
+            if (m.style.display === 'block') loadModels();
+        }
+
+        async function loadModels() {
+            try {
+                var res = await fetch('/api/models');
+                var data = await res.json();
+                document.getElementById('currentModelLabel').textContent = data.current || 'None';
+                var list = document.getElementById('modelList');
+                list.innerHTML = '';
+                data.models.forEach(function(m) {
+                    var size = (m.size / 1024 / 1024 / 1024).toFixed(1);
+                    var card = document.createElement('div');
+                    card.className = 'source-card';
+                    card.style.display = 'flex';
+                    card.style.justifyContent = 'space-between';
+                    card.style.alignItems = 'center';
+                    card.innerHTML =
+                        '<div>' +
+                            '<div style="color: ' + (m.active ? 'var(--gold)' : 'var(--text)') + '; font-weight: ' + (m.active ? '600' : '400') + '">' +
+                                m.name + (m.active ? ' (active)' : '') +
+                            '</div>' +
+                            '<div style="font-size: 0.75rem; color: var(--muted)">' + size + ' GB</div>' +
+                        '</div>' +
+                        '<div style="display:flex;gap:0.5rem;">' +
+                            (m.active ? '' : '<button class="btn btn-secondary" style="padding:0.3rem 0.75rem;font-size:0.75rem" onclick="switchModel(\'' + m.name + '\')">Use</button>') +
+                            '<button class="btn btn-secondary" style="padding:0.3rem 0.75rem;font-size:0.75rem;color:#ef4444" onclick="deleteModel(\'' + m.name + '\')">Delete</button>' +
+                        '</div>';
+                    list.appendChild(card);
+                });
+
+                var colRes = await fetch('/api/collection');
+                var colData = await colRes.json();
+                document.getElementById('collectionInfo').textContent =
+                    'Vedabase: ' + (colData.points || 0).toLocaleString() + ' passages indexed';
+            } catch(e) {
+                document.getElementById('modelList').innerHTML = '<div style="color:#ef4444">Error loading models</div>';
+            }
+        }
+
+        async function switchModel(name) {
+            await fetch('/api/models/switch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: name })
+            });
+            loadModels();
+        }
+
+        async function pullModel() {
+            var model = document.getElementById('modelSelect').value;
+            doPull(model);
+        }
+
+        async function pullCustomModel() {
+            var model = document.getElementById('customModel').value.trim();
+            if (!model) return;
+            doPull(model);
+        }
+
+        async function doPull(model) {
+            var btn = document.getElementById('pullBtn');
+            var status = document.getElementById('pullStatus');
+            btn.disabled = true;
+            status.textContent = 'Downloading ' + model + '... (this may take several minutes)';
+            try {
+                var res = await fetch('/api/models/pull', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: model })
+                });
+                var data = await res.json();
+                status.textContent = model + ' downloaded successfully!';
+                status.style.color = '#22c55e';
+                loadModels();
+            } catch(e) {
+                status.textContent = 'Error: ' + e.message;
+                status.style.color = '#ef4444';
+            }
+            btn.disabled = false;
+            setTimeout(function() { status.style.color = 'var(--muted)'; }, 5000);
+        }
+
+        async function deleteModel(name) {
+            if (!confirm('Delete model ' + name + '?')) return;
+            await fetch('/api/models/' + encodeURIComponent(name), { method: 'DELETE' });
+            loadModels();
+        }
+
         checkStatus();
         setInterval(checkStatus, 30000);
+        // Load current model name
+        fetch('/api/models').then(function(r) { return r.json(); }).then(function(d) {
+            document.getElementById('currentModelLabel').textContent = d.current || 'None';
+        }).catch(function() {});
     </script>
 </body>
 </html>
