@@ -4,6 +4,20 @@
 
 Offline search over Srila Prabhupada's complete works + Bhakti Yoga course. Runs on Mac, Windows, and Linux. No internet needed for search.
 
+---
+
+### Quick Install — Mac / Linux (one command):
+
+```bash
+curl -sL https://raw.githubusercontent.com/juanmanuelferrera/veda/main/install-remote.sh | bash
+```
+
+### Quick Install — Windows:
+
+> Download **[VEDA.zip](https://github.com/juanmanuelferrera/veda/releases/latest)**, unzip, double-click `OPEN ON WINDOWS.exe`
+
+---
+
 ## Features
 
 - **Vedabase Search** — 58,437 passages from 29 books, conversations, lectures, and letters
@@ -11,16 +25,6 @@ Offline search over Srila Prabhupada's complete works + Bhakti Yoga course. Runs
 - **Book filter** — search within a specific book
 - **AI answers** (optional) — connect your own Gemini, OpenAI, or Claude API key
 - **Cross-platform** — Mac, Windows, Linux from the same USB or download
-
-## Install from anywhere (one command)
-
-### Mac / Linux
-```bash
-curl -sL https://raw.githubusercontent.com/juanmanuelferrera/veda/main/install-remote.sh | bash
-```
-
-### Windows
-Download [VEDA.zip](https://github.com/juanmanuelferrera/veda/releases/latest) and run `OPEN ON WINDOWS.exe`
 
 ## Use from USB
 
