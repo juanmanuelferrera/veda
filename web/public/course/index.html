@@ -78,8 +78,12 @@
 <div class="container">
     <header>
         <a href="../" class="back-link">&larr; V.E.D.A.</a>
-        <h1>Curso de Bhakti Yoga</h1>
+        <h1 id="courseTitle">Curso de Bhakti Yoga</h1>
         <p>Facilitador: Jagannatha Mishra Dasa</p>
+        <div class="lang-toggle">
+            <button class="lang-btn active" id="lang-es" onclick="setLang('es')">ES</button>
+            <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+        </div>
     </header>
 
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
@@ -118,6 +122,30 @@ var courseData = [];
 var currentUnit = 0;
 var userAnswers = {};
 var scores = JSON.parse(localStorage.getItem('veda_course_scores') || '{}');
+var lang = localStorage.getItem('veda_course_lang') || 'es';
+
+function setLang(l) {
+    lang = l;
+    localStorage.setItem('veda_course_lang', l);
+    document.getElementById('lang-es').classList.toggle('active', l === 'es');
+    document.getElementById('lang-en').classList.toggle('active', l === 'en');
+    document.getElementById('courseTitle').textContent = l === 'es' ? 'Curso de Bhakti Yoga' : 'Bhakti Yoga Course';
+    document.getElementById('progressText').textContent = getProgressText();
+    renderUnits();
+}
+
+function t(obj, field) {
+    // Get translated field, fallback to Spanish
+    var en = obj[field + '_en'];
+    if (lang === 'en' && en && en.length > 0) return en;
+    return obj[field + '_es'] || '';
+}
+
+function getProgressText() {
+    var completed = Object.keys(scores).length;
+    if (lang === 'en') return completed + ' / ' + courseData.length + ' units completed';
+    return completed + ' / ' + courseData.length + ' unidades completadas';
+}
 
 async function loadCourse() {
     var res = await fetch('course-data.json');
@@ -146,14 +174,17 @@ function renderUnits() {
         }
 
         var qCount = unit.quiz ? unit.quiz.questions.length : 0;
+        var lessonLabel = lang === 'en' ? ' lesson · ' : ' lección · ';
+        var qLabel = lang === 'en' ? ' questions' : ' preguntas';
+        var pendingLabel = lang === 'en' ? 'Pending' : 'Pendiente';
         var card = document.createElement('div');
         card.className = 'unit-card';
         card.onclick = function() { showLesson(i); };
         card.innerHTML =
             '<div class="unit-num">' + unit.unit + '</div>' +
             '<div class="unit-info">' +
-                '<div class="unit-title">' + unit.title_es + '</div>' +
-                '<div class="unit-meta">' + unit.lessons.length + ' lección · ' + qCount + ' preguntas</div>' +
+                '<div class="unit-title">' + t(unit, 'title') + '</div>' +
+                '<div class="unit-meta">' + unit.lessons.length + lessonLabel + qCount + qLabel + '</div>' +
             '</div>' +
             scoreHtml;
         list.appendChild(card);
@@ -178,11 +209,13 @@ function showLesson(idx) {
     document.getElementById('quizView').classList.remove('active');
     document.getElementById('lessonView').classList.add('active');
 
-    document.getElementById('lessonTitle').textContent = 'Unidad ' + unit.unit + ': ' + unit.title_es;
+    var unitLabel = lang === 'en' ? 'Unit ' : 'Unidad ';
+    document.getElementById('lessonTitle').textContent = unitLabel + unit.unit + ': ' + t(unit, 'title');
 
     var content = '';
     unit.lessons.forEach(function(lesson) {
-        var text = lesson.content_es || '';
+        var text = t(lesson, 'content');
+        if (!text) text = lesson.content_es || '';
         var paragraphs = text.split('\n\n');
         paragraphs.forEach(function(p) {
             p = p.trim();
@@ -200,7 +233,7 @@ function showQuiz() {
 
     document.getElementById('lessonView').classList.remove('active');
     document.getElementById('quizView').classList.add('active');
-    document.getElementById('quizTitle').textContent = 'Prueba ' + unit.unit;
+    document.getElementById('quizTitle').textContent = (lang === 'en' ? 'Quiz ' : 'Prueba ') + unit.unit;
     document.getElementById('quizResult').style.display = 'none';
     document.getElementById('submitQuiz').style.display = 'inline-block';
     userAnswers = {};
@@ -215,13 +248,15 @@ function showQuiz() {
 
         var optionsHtml = '';
         var letters = ['A', 'B', 'C', 'D'];
-        q.options_es.forEach(function(opt, oi) {
+        var options = (lang === 'en' && q.options_en) ? q.options_en : q.options_es;
+        options.forEach(function(opt, oi) {
             optionsHtml += '<button class="option" data-q="' + qi + '" data-o="' + oi + '" onclick="selectOption(' + qi + ',' + oi + ')">' +
                 letters[oi] + '. ' + opt + '</button>';
         });
 
-        card.innerHTML = '<div class="q-num">Pregunta ' + q.id + '</div>' +
-            '<div class="q-text">' + q.q_es + '</div>' +
+        var qLabel = lang === 'en' ? 'Question ' : 'Pregunta ';
+        card.innerHTML = '<div class="q-num">' + qLabel + q.id + '</div>' +
+            '<div class="q-text">' + t(q, 'q') + '</div>' +
             optionsHtml;
         container.appendChild(card);
     });
@@ -269,12 +304,15 @@ function submitQuiz() {
     resultEl.style.display = 'block';
     document.getElementById('resultScore').textContent = correct + ' / ' + questions.length;
     document.getElementById('resultScore').style.color = pct >= 70 ? 'var(--green)' : 'var(--red)';
-    document.getElementById('resultLabel').textContent = pct >= 70 ? 'Aprobado' : 'Sigue estudiando';
+    document.getElementById('resultLabel').textContent = pct >= 70 ? (lang === 'en' ? 'Passed' : 'Aprobado') : (lang === 'en' ? 'Keep studying' : 'Sigue estudiando');
     document.getElementById('submitQuiz').style.display = 'none';
     window.scrollTo(0, document.body.scrollHeight);
 }
 
 loadCourse();
+// Apply saved language
+document.getElementById('lang-' + lang).classList.add('active');
+document.getElementById('lang-' + (lang === 'es' ? 'en' : 'es')).classList.remove('active');
 </script>
 </body>
 </html>
