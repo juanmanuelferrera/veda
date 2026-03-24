@@ -231,7 +231,7 @@ function showLesson(idx) {
     });
     document.getElementById('lessonContent').innerHTML = content;
     document.getElementById('quizBtn').style.display = unit.quiz ? 'inline-block' : 'none';
-    window.scrollTo(0, 0);
+    setTimeout(function() { window.scrollTo({ top: 0, behavior: 'instant' }); }, 50);
 }
 
 function showQuiz() {
@@ -269,7 +269,7 @@ function showQuiz() {
         container.appendChild(card);
     });
 
-    window.scrollTo(0, 0);
+    setTimeout(function() { window.scrollTo({ top: 0, behavior: 'instant' }); }, 50);
 }
 
 function selectOption(qi, oi) {
