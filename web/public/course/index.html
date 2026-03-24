@@ -131,7 +131,12 @@ function setLang(l) {
     document.getElementById('lang-en').classList.toggle('active', l === 'en');
     document.getElementById('courseTitle').textContent = l === 'es' ? 'Curso de Bhakti Yoga' : 'Bhakti Yoga Course';
     document.getElementById('progressText').textContent = getProgressText();
-    renderUnits();
+    // Re-render current view (not quiz — quiz stays in its original language)
+    if (document.getElementById('lessonView').classList.contains('active')) {
+        showLesson(currentUnit);
+    } else if (!document.getElementById('quizView').classList.contains('active')) {
+        renderUnits();
+    }
 }
 
 function t(obj, field) {
@@ -199,6 +204,7 @@ function showUnits() {
     document.getElementById('unitList').style.display = 'grid';
     document.getElementById('lessonView').classList.remove('active');
     document.getElementById('quizView').classList.remove('active');
+    document.querySelector('.lang-toggle').style.display = 'flex';
     renderUnits();
 }
 
@@ -208,6 +214,7 @@ function showLesson(idx) {
     document.getElementById('unitList').style.display = 'none';
     document.getElementById('quizView').classList.remove('active');
     document.getElementById('lessonView').classList.add('active');
+    document.querySelector('.lang-toggle').style.display = 'flex';
 
     var unitLabel = lang === 'en' ? 'Unit ' : 'Unidad ';
     document.getElementById('lessonTitle').textContent = unitLabel + unit.unit + ': ' + t(unit, 'title');
@@ -233,6 +240,7 @@ function showQuiz() {
 
     document.getElementById('lessonView').classList.remove('active');
     document.getElementById('quizView').classList.add('active');
+    document.querySelector('.lang-toggle').style.display = 'none';
     document.getElementById('quizTitle').textContent = (lang === 'en' ? 'Quiz ' : 'Prueba ') + unit.unit;
     document.getElementById('quizResult').style.display = 'none';
     document.getElementById('submitQuiz').style.display = 'inline-block';
