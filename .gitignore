@@ -1,5 +1,6 @@
 node_modules/
 data/vedabase.md
 data/*.zim
+web/public/vedabase-index.json
 .DS_Store
 *.log
