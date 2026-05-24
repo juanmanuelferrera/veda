@@ -77,7 +77,7 @@
 <body>
 <div class="container">
     <header>
-        <a href="../" class="back-link">&larr; V.E.D.A.</a>
+        <a href="https://veda.vedicvault.org" class="back-link">&larr; V.E.D.A.</a>
         <h1 id="courseTitle">Curso de Bhakti Yoga</h1>
         <p>Facilitador: Jagannatha Mishra Dasa</p>
         <div class="lang-toggle">
@@ -325,5 +325,8 @@ loadCourse();
 document.getElementById('lang-' + lang).classList.add('active');
 document.getElementById('lang-' + (lang === 'es' ? 'en' : 'es')).classList.remove('active');
 </script>
+<!-- Vedic Vault Hub — floating lotus -->
+<a href="https://vedicvault.org" title="Back to Vedic Vault Hub" aria-label="Back to Vedic Vault Hub" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff7ed,#fed7aa 60%,#fb923c);box-shadow:0 4px 16px rgba(249,115,22,0.35);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.7rem;transition:transform 0.3s,box-shadow 0.3s;animation:lotus-float 3s ease-in-out infinite;" onmouseover="this.style.transform='scale(1.12)';this.style.boxShadow='0 6px 24px rgba(249,115,22,0.5)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 16px rgba(249,115,22,0.35)'">🪷</a>
+<style>@keyframes lotus-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
 </body>
 </html>
