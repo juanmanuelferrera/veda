@@ -270,6 +270,8 @@ function search() {
             }
         });
 
+        // Convert *text* to italics
+        text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
         card.innerHTML = '<div class="result-meta">' + meta + '</div><div class="result-text">' + text + '</div>';
         container.appendChild(card);
     });
@@ -306,7 +308,7 @@ async function askAI() {
         }
 
         document.getElementById('aiProvider').textContent = provider;
-        document.getElementById('aiText').textContent = answer;
+        document.getElementById('aiText').innerHTML = answer.replace(/\*([^*]+)\*/g, '<em>$1</em>');
         document.getElementById('aiAnswer').classList.add('visible');
     } catch(e) {
         alert('AI Error: ' + e.message);
